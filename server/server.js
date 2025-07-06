@@ -10,8 +10,70 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
+// CORS Configuration
+const allowedOrigins = [
+  // Development
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  
+  // Common production domains - replace with your actual domains
+  'https://your-frontend-domain.com',
+  'https://*.vercel.app',
+  'https://*.netlify.app',
+  'https://*.github.io'
+];
+
 // Middleware
-app.use(cors());
+app.use((req, res, next) => {
+  // Log incoming requests for debugging
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`, {
+    origin: req.headers.origin,
+    'user-agent': req.headers['user-agent']
+  });
+  next();
+});
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    
+    // Allow all origins in development
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // In production, check against allowed origins
+    if (allowedOrigins.some(allowedOrigin => 
+      origin === allowedOrigin || 
+      allowedOrigin.includes('*') && 
+      new URL(origin).hostname.endsWith(allowedOrigin.split('*.')[1])
+    )) {
+      return callback(null, true);
+    }
+    
+    console.warn(`Blocked request from unauthorized origin: ${origin}`);
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  exposedHeaders: ['Content-Range', 'X-Total-Count'],
+  maxAge: 600 // 10 minutes
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 
 // Routes

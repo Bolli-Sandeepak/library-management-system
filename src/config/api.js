@@ -2,10 +2,11 @@ import axios from 'axios';
 
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Your backend server URL
+  baseURL: 'https://library-management-system-1-jfn4.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true // Important for cookies if using them
 });
 
 // Add a request interceptor to include the auth token
