@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Users, TrendingUp, Plus, Eye, Edit, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/api';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
 
       // Try to fetch stats if the endpoint exists
       try {
-        const statsRes = await axios.get('/api/admin/stats');
+        const statsRes = await api.get('/admin/stats');
         setStats(statsRes.data);
       } catch (error) {
         console.warn('Could not fetch stats:', error.message);
@@ -39,7 +39,7 @@ const AdminDashboard = () => {
 
       // Fetch recent books
       try {
-        const booksRes = await axios.get('/api/books?limit=5');
+        const booksRes = await api.get('/books?limit=5');
         const booksData = booksRes.data?.data || booksRes.data?.books || booksRes.data || [];
         setRecentBooks(Array.isArray(booksData) ? booksData : []);
       } catch (error) {
@@ -49,7 +49,7 @@ const AdminDashboard = () => {
 
       // Try to fetch recent borrows if the endpoint exists
       try {
-        const borrowsRes = await axios.get('/api/borrow?limit=5');
+        const borrowsRes = await api.get('/borrow?limit=5');
         const borrowsData = borrowsRes.data?.data || borrowsRes.data?.borrows || borrowsRes.data || [];
         setRecentBorrows(Array.isArray(borrowsData) ? borrowsData : []);
       } catch (error) {
@@ -66,7 +66,7 @@ const AdminDashboard = () => {
   const handleDeleteBook = async (bookId) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
-        await axios.delete(`/api/books/${bookId}`);
+        await api.delete(`/books/${bookId}`);
         fetchDashboardData();
       } catch (error) {
         console.error('Error deleting book:', error);

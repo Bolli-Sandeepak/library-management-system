@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { BookOpen, Calendar, Globe, HardDrive, ArrowLeft, ExternalLink } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/api';
 
 const BookDetail = () => {
   const { id } = useParams();
@@ -19,7 +19,7 @@ const BookDetail = () => {
 
   const fetchBook = async () => {
     try {
-      const response = await axios.get(`/api/books/${id}`);
+      const response = await api.get(`/books/${id}`);
       setBook(response.data);
     } catch (error) {
       console.error('Error fetching book:', error);
@@ -37,7 +37,7 @@ const BookDetail = () => {
 
     setBorrowing(true);
     try {
-      await axios.post('/api/borrow', { bookId: id });
+      await api.post('/borrow', { bookId: id });
       navigate('/dashboard');
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to borrow book');

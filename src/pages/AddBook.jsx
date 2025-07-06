@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, ArrowLeft } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/api';
 
 const AddBook = () => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const AddBook = () => {
     setError('');
 
     try {
-      await axios.post('/api/books', formData);
+      const response = await api.post('/books', formData);
       navigate('/admin/books');
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to add book');

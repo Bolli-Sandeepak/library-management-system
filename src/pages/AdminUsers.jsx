@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, BookOpen, Calendar, Search } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/api';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -13,7 +13,7 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/api/admin/users');
+      const response = await api.get('/admin/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
