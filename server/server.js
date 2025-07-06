@@ -19,7 +19,7 @@ const allowedOrigins = [
   'http://127.0.0.1:3000',
   
   // Common production domains - replace with your actual domains
-  'https://your-frontend-domain.com',
+  'https://library-management-system-9qs8.vercel.app',
   'https://*.vercel.app',
   'https://*.netlify.app',
   'https://*.github.io'
