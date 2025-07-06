@@ -11,6 +11,7 @@ router.get('/', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search || '';
+    const genre = req.query.genre || '';
     const skip = (page - 1) * limit;
 
     // Build search query
@@ -22,6 +23,11 @@ router.get('/', async (req, res) => {
         { isbn: { $regex: search, $options: 'i' } },
         { genre: { $regex: search, $options: 'i' } }
       ];
+    }
+
+    // Add genre filter if provided
+    if (genre) {
+      query.genre = genre;
     }
 
     const [books, total] = await Promise.all([
@@ -121,68 +127,7 @@ router.post('/', adminAuth, async (req, res) => {
   }
 });
 
-// Get all books
-router.get('/', async (req, res) => {
-  try {
-    const { search, genre, page = 1, limit = 10 } = req.query;
-    const query = {};
-
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { author: { $regex: search, $options: 'i' } }
-      ];
-    }
-
-    if (genre) {
-      query.genre = genre;
-    }
-
-    // Convert page and limit to numbers
-    const pageNum = parseInt(page, 10) || 1;
-    const limitNum = parseInt(limit, 10) || 10;
-
-    // Get total count and paginated results
-    const [books, total] = await Promise.all([
-      Book.find(query)
-        .limit(limitNum)
-        .skip((pageNum - 1) * limitNum)
-        .sort({ createdAt: -1 })
-        .lean(),
-      Book.countDocuments(query)
-    ]);
-
-    console.log(`Found ${books.length} books (total: ${total})`);
-
-    // Standardize the response format
-    const response = {
-      success: true,
-      data: {
-        books: books.map(book => ({
-          ...book,
-          // Ensure all required fields have defaults
-          title: book.title || 'Untitled',
-          author: book.author || 'Unknown Author',
-          genre: book.genre || book.category || 'Uncategorized',
-          type: book.type || 'physical',
-          availableCopies: book.availableCopies || 0,
-          totalCopies: book.totalCopies || 0,
-          coverImage: book.coverImage || ''
-        }))
-      },
-      pagination: {
-        total,
-        page: pageNum,
-        limit: limitNum,
-        totalPages: Math.ceil(total / limitNum)
-      }
-    };
-
-    res.json(response);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
+// Get all books - route handler removed as it was a duplicate
 
 // Get book by ID
 router.get('/:id', async (req, res) => {

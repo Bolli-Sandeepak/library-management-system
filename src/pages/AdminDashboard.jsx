@@ -39,19 +39,68 @@ const AdminDashboard = () => {
 
       // Fetch recent books
       try {
-        const booksRes = await api.get('/books?limit=5');
-        const booksData = booksRes.data?.data || booksRes.data?.books || booksRes.data || [];
-        setRecentBooks(Array.isArray(booksData) ? booksData : []);
+        console.log('Fetching recent books...');
+        const response = await api.get('/books?limit=5');
+        
+        // Log the full response for debugging
+        console.log('Books API Response:', response);
+        
+        // Handle different response formats
+        let booksData = [];
+        
+        // Check if response.data is an array
+        if (Array.isArray(response.data)) {
+          booksData = response.data;
+        } 
+        // Check for { data: { books: [...] } } format
+        else if (response.data?.data?.books) {
+          booksData = response.data.data.books;
+        }
+        // Check for { data: [...] } format
+        else if (Array.isArray(response.data?.data)) {
+          booksData = response.data.data;
+        }
+        // Check for { books: [...] } format
+        else if (Array.isArray(response.data?.books)) {
+          booksData = response.data.books;
+        }
+        // If response.data is an object but not in expected formats
+        else if (response.data && typeof response.data === 'object') {
+          // If it's a single book object, put it in an array
+          booksData = [response.data];
+        }
+        
+        console.log('Processed books data:', booksData);
+        setRecentBooks(booksData);
       } catch (error) {
-        console.warn('Could not fetch recent books:', error.message);
+        console.error('Error fetching recent books:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+          config: {
+            url: error.config?.url,
+            method: error.config?.method,
+            headers: error.config?.headers
+          }
+        });
         setRecentBooks([]);
       }
 
       // Try to fetch recent borrows if the endpoint exists
       try {
-        const borrowsRes = await api.get('/borrow?limit=5');
-        const borrowsData = borrowsRes.data?.data || borrowsRes.data?.borrows || borrowsRes.data || [];
-        setRecentBorrows(Array.isArray(borrowsData) ? borrowsData : []);
+        const response = await api.get('/borrow?limit=5');
+        let borrowsData = [];
+        
+        // Handle different response formats
+        if (Array.isArray(response.data)) {
+          borrowsData = response.data;
+        } else if (response.data?.data) {
+          borrowsData = Array.isArray(response.data.data) ? response.data.data : [response.data.data];
+        } else if (response.data?.borrows) {
+          borrowsData = Array.isArray(response.data.borrows) ? response.data.borrows : [response.data.borrows];
+        }
+        
+        setRecentBorrows(borrowsData);
       } catch (error) {
         console.warn('Could not fetch recent borrows:', error.message);
         setRecentBorrows([]);
