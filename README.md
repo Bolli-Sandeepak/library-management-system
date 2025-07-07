@@ -70,3 +70,30 @@ Prevents unauthorized access after leaving the system.
 Each user has a fixed number of slots (e.g., 3) for borrowing books.
 
 Prevents over-borrowing and encourages timely returns.
+
+
+🔐 Login Functionality
+The system supports two types of login access:
+
+👤 User Login
+Multiple users can sign up and log in using their own email and password.
+
+Each user has access to the book browsing and borrowing features based on available slots.
+
+User accounts are stored securely in the database and can be extended with more personal data or preferences.
+
+🛡 Admin Login
+The admin has a dedicated login with fixed credentials:
+
+makefile
+Email: admin@gmail.com
+Password: admin123
+Only the admin can:
+
+Add, edit, or delete books
+
+Access the admin dashboard with borrow/return statistics
+
+Manage and monitor users
+
+Admin credentials are hardcoded or predefined (can be moved to environment variables in future versions for better security).
